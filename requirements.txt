@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+aiohttp
+python-dotenv
+sentence-transformers
+numpy
+pydantic
+requests
+playwright
+markdownify
+

@@ -15,4 +15,5 @@
 
 ### API: virtual_ta_api_test.py
 
-### API Endpoint: 
+### API Endpoint: https://tds-virtual-ta.serveo.net/query
+

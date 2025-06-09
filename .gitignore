@@ -9,6 +9,7 @@ tds/
 .env
 preprocess.py
 base_creation.py
+auth.json
 *.pyc
 .DS_Store
 query_log.jsonl

@@ -3,7 +3,7 @@ description: "TDS Virtual TA Project Sample (but not the actual evaluation) Ques
 providers:
   - id: https
     config:
-      url: http://localhost:8000/query # Replace this with your API endpoint
+      url: https://tds-virtual-ta.serveo.net/query # Replace this with your API endpoint
       method: POST
       headers:
         Content-Type: application/json

@@ -2,7 +2,9 @@ import os
 import json
 import sqlite3
 import numpy as np
-from fastapi import FastAPI, HTTPException
+import logging
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 from typing import List, Dict
@@ -11,6 +13,10 @@ import asyncio
 import re
 from dotenv import load_dotenv
 
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("uvicorn.error")
+
 # Load environment variables
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
@@ -18,6 +24,16 @@ if not API_KEY:
     raise RuntimeError("API_KEY not set in environment")
 
 app = FastAPI()
+
+# Add CORS middleware to handle preflight requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace "*" with ["http://localhost:3000"] or your frontend URL for more security
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 EMBEDDING_MODEL = SentenceTransformer("BAAI/bge-base-en-v1.5")
 DB_PATH = "knowledge_base.db"
 SIMILARITY_THRESHOLD = 0.5
@@ -139,7 +155,19 @@ Sources:
             return result["choices"][0]["message"]["content"]
 
 @app.post("/query", response_model=QueryResponse)
-async def query_virtual_ta(req: QueryRequest):
+async def query_virtual_ta(req: QueryRequest, request: Request):
+    # Log client IP
+    client_host = request.client.host
+    logger.info(f"Incoming request from IP: {client_host}")
+
+    # Log request headers
+    headers_dict = dict(request.headers)
+    logger.info(f"Request headers: {headers_dict}")
+
+    # Log raw body (request JSON)
+    body_bytes = await request.body()
+    logger.info(f"Request raw body: {body_bytes.decode('utf-8')}")
+
     try:
         query_embedding = get_embedding(req.question)
         chunks = retrieve_chunks(query_embedding)
@@ -164,5 +192,6 @@ async def query_virtual_ta(req: QueryRequest):
         return QueryResponse(answer=answer_part.strip(), links=links)
 
     except Exception as e:
+        logger.error(f"Error processing query: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 

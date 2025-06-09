@@ -49,6 +49,7 @@ propcache==0.3.1
 pydantic==2.11.5
 pydantic-core==2.33.2
 pyee==13.0.0
+pytesseract==0.3.13
 python-dotenv==1.0.1
 pyyaml==6.0.2
 regex==2024.11.6
